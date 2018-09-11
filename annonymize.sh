@@ -21,14 +21,23 @@ func () {
   file_type=$(basename -- "$target")
   target_directory=$(dirname "$target")
   mkdir -p "$target_directory"
-  awk -F';' -v type="$file_type" 'BEGIN { OFS=";"; ORS="\n"}
+  line1=$(head -n 1 "$source")
+  # Wohnort only appears in formats after 2015
+  ispre15="TRUE"
+  if [[ "$line1" = *"Wohnort"* ]]; then
+    ispre15="FALSE"
+  fi
+
+  awk -F';' -v type="$file_type" -v pre15="$ispre15" 'BEGIN { OFS=";"; ORS="\n"}
                                   {if (NR > 1){
                                     $2="01";
                                     if (type == "fall.csv"){
                                       $5="abc";
                                       $6="xy";
                                       $11=substr($11,1,2);
-                                      $12="Buxtehude";
+                                      if (pre15 == "FALSE"){
+                                        $12="Buxtehude";
+                                      }
                                     }
                                   };
                                    print}' "$source" > "$target"
