@@ -44,8 +44,23 @@ func () {
 }
 export -f func
 
+funcmv (){
+  file="$0"
+  ftype="$2"  # I don't know why it's 2....
+  dn=$(dirname "$0")
+  mkdir -p "$dn"
+  target="$dn"/"$ftype".csv
+  mv "$0" "$target"
+}
+export -f funcmv
 
-files=( 'fall.csv' 'entgelte.csv' 'ops.csv' 'icd.csv' 'fab.csv' )
+
+files=( 'fall' 'entgelte' 'ops' 'icd' 'fab' )
+# move and rename files to standard notation
 for f in "${files[@]}"; do
-  find $SRC -iname "$f" -type f -exec bash -c 'func "$0"' {} \;
+  find "$SRC" -regextype posix-extended -type f -iregex '.*/[0-9]*'$f'([0-9\_]\w*)?\.csv' -exec bash -c 'funcmv "$0" "$1"' {} $f \;
+done
+
+for f in "${files[@]}"; do
+  find $SRC -iname "$f".csv -type f -exec bash -c 'func "$0"' {} \;
 done
