@@ -30,7 +30,6 @@ func () {
 
   awk -F';' -v type="$file_type" -v pre15="$ispre15" 'BEGIN { OFS=";"; ORS="\n"}
                                   {if (NR > 1){
-                                    $2="01";
                                     if (type == "fall.csv"){
                                       $5="abc";
                                       $6="xy";
